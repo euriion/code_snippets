@@ -1,0 +1,1 @@
+date --date '0day ago' +%Y%m%d
