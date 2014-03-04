@@ -11,28 +11,54 @@
 # 중기예보 전국은 다음과 같다.
 # http://www.kma.go.kr/weather/forecast/mid-term-rss3.jsp?stnId=108
 
+#<description>
+#<body>  
+#  <location wl_ver="3">
+#  <province>서울ㆍ인천ㆍ경기도</province>
+#  <city>서울</city>
+#  
+#  <data>
+#  <mode>A02</mode>
+#  <tmEf>2014-03-05 00:00</tmEf>
+#  <wf>구름많고 눈/비</wf>
+#  <tmn>0</tmn>
+#  <tmx>6</tmx>
+#  <reliability>보통</reliability>
+#  </data>  
+
 if (!require(RCurl)) {
   install.packages("RCurl")
   require(RCurl)
 }
-
 
 if (!require(XML)) {
   install.packages("XML")
   require(XML)
 }
 
-
 source.url <- "http://www.kma.go.kr/weather/forecast/mid-term-rss3.jsp?stnId=108"
 xml.text = getURIAsynchronous(source.url)
-# xml.parsed = xmlParse(xml.text)
 xml.parsed = xmlInternalTreeParse(xml.text)
-xmlToDataFrame(getNodeSet(xml.parsed, "//body/location"), homogeneous=T)
-xmlToDataFrame(getNodeSet(xml.parsed, "//body/location/data"), homogeneous=T)
-head(xmlToDataFrame(getNodeSet(xml.parsed, "//body/location"), homogeneous=T), n=1)
-getNodeSet(xml.parsed, "//body/location/city")
-?xmlToDataFrame
-xml.df1 <- xmlToDataFrame(nodes = getNodeSet(xml.parsed, "//body/location/city | "))
 
+locationNodes <- getNodeSet(xml.parsed, "/rss/channel/item/description/body/location")
 
+df <- data.frame()
+for (i in seq(1, length(locationNodes)))
+  node <- locationNodes[[i]]
+  province <- xmlValue(xmlChildren(node)[[1]])
+  city <- xmlValue(xmlChildren(node)[[2]])
+  dataLength <- length(xmlChildren(node))
+  dataList <- xmlChildren(node)[3:dataLength]
+  
+  data.mat <- sapply(dataList, function(x) {
+    c(province, city, xmlValue(xmlChildren(dataList[[1]])$mode),
+      xmlValue(xmlChildren(dataList[[1]])$tmEf),
+      xmlValue(xmlChildren(dataList[[1]])$wf),
+      xmlValue(xmlChildren(dataList[[1]])$tmn),
+      xmlValue(xmlChildren(dataList[[1]])$tmx),
+      xmlValue(xmlChildren(dataList[[1]])$reliability))
+  })
+  df <- rbind(df,t(data.mat))
+})
 
+df
