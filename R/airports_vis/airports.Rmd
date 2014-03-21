@@ -1,0 +1,51 @@
+# 공항 데이터
+
+## Data spec
+
+* Airport ID  Unique OpenFlights identifier for this airport.
+* Name	Name of airport. May or may not contain the City name.
+* City	Main city served by airport. May be spelled differently from Name.
+* Country	Country or territory where airport is located.
+* IATA/FAA	3-letter FAA code, for airports located in Country "United States of America".
+* 3-letter IATA code, for all other airports. Blank if not assigned.
+* ICAO	4-letter ICAO code.Blank if not assigned.
+* Latitude	Decimal degrees, usually to six significant digits. Negative is South, positive is North.
+* Longitude	Decimal degrees, usually to six significant digits. Negative is West, positive is East.
+* Altitude	In feet.
+* mezone	Hours offset from UTC. Fractional hours are expressed as decimals, eg. India is 5.5.
+* DST	Daylight savings time. One of E (Europe), A (US/Canada), S (South America), O (Australia), Z (New Zealand), N (None) or U (Unknown). See also: Help: Time
+
+## 데이터 입수
+
+```{r}
+work_direcotory <- "C:\\Users\\aiden.hong\\Documents\\workspace\\nexr-analytics\\codes\\airports"
+
+setwd(work_direcotory)
+
+airports <- read.table("./data/airports.dat", sep=",", header=F)
+colnames(airports) <- c("id", "name", "city", "country", "iata", "icao", "latitude", "gongitude", "altitude", "timezone", "dst")
+```
+
+## 공항수가 많은 나라 Top 30 목록
+
+```{r}
+airports.bycountry <- aggregate(data=airports,id  ~ country, FUN=length)
+colnames(airports.bycountry) <- c("country", "airport_count")
+top30 <- head(airports.bycountry[order(airports.bycountry$airport_count, decreasing=T),],30)
+rownames(top30) <- NULL
+top30
+```
+
+## 북한의 공항
+
+```{r}
+library(ggplot2)
+ggplot(data=top30 , aes(x=country, y=airport_count)) + geom_bar()
+airports[airports$country %in% c("North Korea"),]
+```
+
+
+#install.packages("rworldmap")
+#library("rworldmap")
+#mapDevice() 
+#identifyCountries(getMap(),nameColumnToPlot="POP2005")
