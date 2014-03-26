@@ -1,0 +1,16 @@
+customer,shop,auth_dt,cardno,class
+cust1,shop1,20130415161518,card01,reject
+cust1,shop1,20130415161519,card02,reject
+cust1,shop1,20130415161520,card03,reject
+cust1,shop1,20130415161521,card04,accept
+cust1,shop1,20130415162538,card02,reject
+cust1,shop1,20130415162539,card03,reject
+cust1,shop1,20130415162540,card04,accept
+cust1,shop1,20130415162541,card05,reject
+cust2,shop3,20130416041538,card11,reject
+cust2,shop3,20130416041548,card11,reject
+cust2,shop3,20130416041558,card12,reject
+cust2,shop3,20130416041641,card13,reject
+cust2,shop3,20130416041813,card14,accept
+cust3,shop3,20130416041813,card21,accept
+cust4,shop11,20130421111813,card31,reject

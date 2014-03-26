@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/code/!svn/ver/10304/nexr-app-cloudlog/scripts/fabric
+END
+fabfile.py
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/code/!svn/ver/10296/nexr-app-cloudlog/scripts/fabric/fabfile.py
+END
+hadoop_check.py
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/code/!svn/ver/10296/nexr-app-cloudlog/scripts/fabric/hadoop_check.py
+END

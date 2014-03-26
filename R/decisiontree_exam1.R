@@ -1,0 +1,95 @@
+# http://www.r-bloggers.com/classification-trees/
+# http://archive.ics.uci.edu/ml/
+# http://www.r-bloggers.com/classification-trees-using-the-rpart-function/
+# http://plantecology.syr.edu/fridley/bio793/cart.html
+# http://www.statmethods.net/advstats/cart.html
+# http://plantecology.syr.edu/fridley/bio793/cart.html
+# http://ecology.msu.montana.edu/labdsv/R/labs/lab6/lab6.html
+# http://msdn.microsoft.com/en-us/library/ms175382(v=sql.105).aspx
+# http://www.mentby.com/Group/r-help/r-classification-tree-model.html
+# data location
+#  - http://archive.ics.uci.edu/ml/
+#  - http://archive.ics.uci.edu/ml/datasets/Ecoli
+#  - data link: http://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data
+#  - spec link: http://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.names
+# http://msdn.microsoft.com/en-us/library/ms175382(v=sql.105).aspx
+
+install.packages("rpart")
+require(rpart)
+ecoli.df = read.table(file="http://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data", header=F, strip.white=T)
+colnames(ecoli.df) <- c(
+  "sequence",
+  "mcg",
+  "gvh",
+  "lip",
+  "chg",
+  "aac",
+  "alm1",
+  "alm2",
+  "class"
+)
+
+dim(ecoli.df)
+head(ecoli.df)
+    Sequence  mcv  gvh  lip chg  aac alm1 alm2 class
+1  AAT_ECOLI 0.49 0.29 0.48 0.5 0.56 0.24 0.35    cp
+2 ACEA_ECOLI 0.07 0.40 0.48 0.5 0.54 0.35 0.44    cp
+3 ACEK_ECOLI 0.56 0.40 0.48 0.5 0.49 0.37 0.46    cp
+4 ACKA_ECOLI 0.59 0.49 0.48 0.5 0.52 0.45 0.36    cp
+5  ADI_ECOLI 0.23 0.32 0.48 0.5 0.55 0.25 0.35    cp
+6 ALKH_ECOLI 0.67 0.39 0.48 0.5 0.36 0.38 0.46    cp
+
+# xtabs로 레이블별 서머리
+xtabs( ~ class, data = ecoli.df)
+class
+ cp  im imL imS imU  om omL  pp 
+143  77   2   2  35  20   5  52
+
+# install.packages("tree")
+require(tree)
+
+# 트리 생성 (모델 적용)
+ecoli.tree1 = tree(class ~ mcg + gvh + lip + chg + aac + alm1 + alm2, data = ecoli.df)
+ecoli.tree1 = tree(class ~ mcg, data = ecoli.df)
+ecoli.tree1
+sum(sapply(ecoli.df$mcg,function(x)(x-mean(ecoli.df$mcg))^2))
+sum((ecoli.df$mcg - mean(ecoli.df$mcg))^2)
+
+summary(ecoli.tree1)
+ 
+Classification tree:
+tree(formula = class ~ mcv + gvh + lip + chg + aac + alm1 + alm2, data = ecoli.df)
+Variables actually used in tree construction:
+[1] "alm1" "mcv"  "gvh"  "aac"  "alm2"
+Number of terminal nodes:  10 
+Residual mean deviance:  0.7547 = 246 / 326 
+Misclassification error rate: 0.122 = 41 / 336
+
+The tree function is used in a similar way to other modelling functions in R. 
+The misclassification rate is shown as part of the summary of the tree. 
+This tree can be plotted and annotated with these commands:
+
+plot(ecoli.tree1)
+text(ecoli.tree1, all = T)
+To prune the tree we use cross-validation to identify the point to prune.
+
+cv.tree(ecoli.tree1)
+$size
+ [1] 10  9  8  7  6  5  4  3  2  1
+ 
+$dev
+ [1]  463.6820  457.4463  447.9824  441.8617  455.8318  478.9234  533.5856  586.2820  713.2992 1040.3878
+ 
+$k
+ [1]      -Inf  12.16500  15.60004  19.21572  34.29868  41.10627  50.57044  64.05494 180.78800 355.67747
+ 
+$method
+[1] "deviance"
+ 
+attr(,"class")
+[1] "prune"         "tree.sequence"
+This suggests a tree size of 6 and we can re-fit the tree:
+
+> ecoli.tree2 = prune.misclass(ecoli.tree1, best = 6)
+> summary(ecoli.tree2)
+

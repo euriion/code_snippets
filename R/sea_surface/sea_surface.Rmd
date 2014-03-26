@@ -1,0 +1,57 @@
+해수면 데이터
+=============
+
+정보제공: andrew.kim
+
+```{r setup}
+opts_knit$set(upload.fun = imgur_upload, base.url = NULL) # upload all images to imgur.com
+# opts_chunk$set(fig.width=5, fig.height=5, cache=TRUE)
+````
+
+## 데이터 소스
+
+* 위성에서 관찰한 해수면 데이터로 x축는 년, y축은 해수면으로 되어 있음
+
+```{r}
+data.source.url <- "http://sealevel.colorado.edu/files/2014_rel1/sl_ns_global.txt"
+```
+
+## 데이터 적재
+
+```{r}
+library(RCurl)
+data.source.raw <- getURL(data.source.url)
+# data.source <- read.table(data.source.url, header=T, colClasses=c("character", "character"))
+data.source <- read.table(data.source.url, header=T)
+```
+
+## 데이터 전처리
+
+* 컬럼명을 다루기 쉬운 형태로 치환
+
+```{r}
+colnames(data.source) <- c("year", "msl")
+colnames
+```
+
+### 플로팅
+
+원천 데이터 자체는 그대로 플롯을 할 수 있도록 저장되어 있음
+
+#### 단순 스캐터 플로팅
+
+```{r}
+plot(data.source)
+```
+
+#### 라인 그래프
+
+```{r}
+ggplot(data=data.source, aes(x=year, y=msl)) + geom_line()
+```
+
+
+#### 시사점
+* 시간의 흐름에 따라 해수면이 지속적으로 상승하고 있는 것을 볼 수 있음
+* 2010년이 이후 잠시 해수면이 잠시 하강하였으며 원인 파악이 필요함
+

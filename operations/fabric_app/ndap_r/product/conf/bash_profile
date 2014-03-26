@@ -1,0 +1,52 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+alias go='cd /home/nexr/ndap_provisioning/nexr-provisioning/src/main/python/provisioning'
+
+PACKAGE_HOME=/home/nexr/ndap
+GIT_HOME=/home/nexr/git
+JAVA_HOME=/usr/lib/jvm/jre-1.6.0-openjdk.x86_64
+PYTHON_HOME=/home/nexr/python2.7
+NDAP_HOME=$PACKAGE_HOME
+HADOOP_HOME=$PACKAGE_HOME/hadoop
+HIVE_HOME=$PACKAGE_HOME/hive
+ZK_HOME=$PACKAGE_HOME/zookeeper
+FLUME_HOME=$PACKAGE_HOME/ndap_collector
+FLUME_CONF_DIR=$FLUME_HOME/conf
+HAWK_HOME=$PACKAGE_HOME/ndap_hawk
+OOZIE_HOME=$PACKAGE_HOME/oozie
+LAMA_HOME=$PACKAGE_HOME/ndap_lama
+LAMA_CONF_DIR=$LAMA_HOME/conf
+LAMA_LOG_DIR=$PACKAGE_HOME/logs/ndap_lama
+PATH=$HOME/bin:$GIT_HOME/bin:$JAVA_HOME/bin:$PYTHON_HOME/bin:$HADOOP_HOME/bin:$HIVE_HOME/bin:$ZK_HOME/bin:$FLUME_HOME/bin:$ES_HOME/bin:$HAWK_HOME/bin:$OOZIE_HOME/bin:$LAMA_HOME/bin:$PATH
+CLASSPATH=$JAVA_HOME/lib/tools.jar
+
+# Nexr Search
+ES_MIN_MEM=256m
+ES_MAX_MEM=256m
+ES_HOME=$PACKAGE_HOME/ndap_search
+
+export PATH
+export CLASSPATH
+export PACKAGE_HOME
+export NADP_HOME
+export GIT_HOME
+export JAVA_HOME
+export PYTHON_HOME
+export HADOOP_HOME
+export HIVE_HOME
+export ZK_HOME FLUME_HOME FLUME_CONF_DIR
+export ES_MIN_MEM ES_MAX_MEM ES_HOME
+export HAWK_HOME
+export OOZIE_HOME
+export LAMA_HOME LAMA_CONF_DIR LAMA_LOG_DIR
+
+
+#export PATH=$PATH:~/hivemon/bin:/usr/share/groovy/bin
+

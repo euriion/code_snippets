@@ -1,0 +1,11 @@
+from fabric.api import run
+
+def count_java_process():
+    run("ps aux | grep java | grep -v 'grep' | wc -l")
+
+def host_type():
+    run('uname -a')
+
+def clean_dir():
+    run("rm -Rf /mnt/srv/hadoopdata/*")
+    

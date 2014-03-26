@@ -1,0 +1,32 @@
+Tree model in R
+========================================================
+
+참조: http://ecology.msu.montana.edu/labdsv/R/labs/lab6/lab6.html
+
+먼저 tree 라이브러리를 로딩합니다.
+```{r}
+library(tree)
+```
+
+다음과 같은 샘플 데이터를 하나 생성합니다.
+
+```{r}
+x <- 1:10
+y <- c(0,0,0,0,1,0,1,1,1,1)
+plot(x,y)
+```
+
+```{r}
+test <- tree(factor(y)~x,control=tree.control(nobs=10,mincut=3))
+test
+```
+
+```{r}  
+length(x[x < 4.5]) == 4
+```
+
+
+```{r}  
+test.cv <- cv.tree(test)
+```
+

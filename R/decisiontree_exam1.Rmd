@@ -1,0 +1,123 @@
+Tutorial - R tree models
+========================
+<font color="blue">author: Seonghak Hong (aiden.hong@nexr.com)</font>
+
+References
+- http://www.r-bloggers.com/classification-trees/
+- http://archive.ics.uci.edu/ml/
+- http://www.r-bloggers.com/classification-trees-using-the-rpart-function/
+- http://plantecology.syr.edu/fridley/bio793/cart.html
+- http://www.statmethods.net/advstats/cart.html
+- http://plantecology.syr.edu/fridley/bio793/cart.html
+- http://ecology.msu.montana.edu/labdsv/R/labs/lab6/lab6.html
+- http://msdn.microsoft.com/en-us/library/ms175382(v=sql.105).aspx
+- http://www.mentby.com/Group/r-help/r-classification-tree-model.html
+- http://msdn.microsoft.com/en-us/library/ms175382(v=sql.105).aspx
+- http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
+- http://sfb649.wiwi.hu-berlin.de/fedc_homepage/xplore/ebooks/html/csa/node210.html
+- http://www.docstoc.com/docs/8954435/Decision-Tree-%EB%AA%A9-%EC%B0%A8-Decision-Tree-%EC%82%AC%EB%A1%80-Credit-Scoring
+- http://en.wikipedia.org/wiki/Pruning_(decision_trees)#Cost_complexity_pruning
+- http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
+- http://pegasus.cc.ucf.edu/~xsu/CLASS/STA5703/R-chp9.R
+- http://florence.acadiau.ca/collab/hugh_public/index.php?title=R:cv.tree_problem
+- http://www.public.iastate.edu/~maitra/stat501/Rcode/ecoli.R
+- https://www.google.co.kr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&ved=0CEAQFjAA&url=http%3A%2F%2Ffaculty.cs.tamu.edu%2Fioerger%2Fcs633-spr10%2Fpruning.ppt&ei=drpmUauEB4byrQfcsYDYCQ&usg=AFQjCNFcY33mxFBaW6j51qLOnhKAxel7uQ&bvm=bv.45107431,d.aGc&cad=rjt
+- http://www.statmethods.net/advstats/cart.html
+- http://finzi.psych.upenn.edu/R/Rhelp02a/archive/61879.html
+- ROC curves
+    - http://users.dsic.upv.es/grupos/elp/cferri/105.pdf
+    - http://adnoctum.tistory.com/121
+    - http://programming-r-pro-bro.blogspot.kr/2011/10/modelling-with-r-part-4.html
+- http://www.biostat.jhsph.edu/~iruczins/teaching/misc/cart/lbw.R
+- http://acccn.net/cr569/Rstuff/NewMining/mining1/R/best.size.tree.R
+- http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/code/tree.r
+- http://heuristically.wordpress.com/2009/12/18/plot-roc-curve-lift-chart-random-forest/
+- http://heuristically.wordpress.com/2009/12/18/plot-roc-curve-lift-chart-random-forest/
+- http://wwww.cbgstat.com/v2/method_ROC_curve_MedCalc/ROC_curve_MedCalc.php
+- http://blog.daum.net/sbyddr2/4
+- http://blog.daum.net/kitty7713/14
+- http://blog.naver.com/PostView.nhn?blogId=kusa29&logNo=120029383465
+- http://gim.unmc.edu/dxtests/roc2.htm
+- http://stats.stackexchange.com/questions/13638/software-for-drawing-roc-curve
+- http://mkseo.pe.kr/stats/?p=790
+  - FINDING OPTIMAL cutoff in R
+- http://cs.croakun.com/index.php?do=/kaichew/blog/roc-curve/
+  - R ROC 예제
+- http://r.789695.n4.nabble.com/ROC-curve-in-R-td830715.html
+  - 로지스틱 리그레션 스터디
+- http://snowple.tistory.com/288
+  - 민감도 설명
+#### ROCR에 대한 차트 표시
+- http://rocr.bioinf.mpi-sb.mpg.de/
+
+## Data Location
+- http://archive.ics.uci.edu/ml/
+- http://archive.ics.uci.edu/ml/datasets/Ecoli
+- data link: http://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data
+- spec link: http://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.names
+
+
+
+## Data preparation
+### Loading data - ecoli
+```{r}
+ecoli.df = read.table(file="http://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data", header=F, strip.white=T)
+colnames(ecoli.df) <- c("sequence", "mcg", "gvh", "lip", "chg", "aac", "alm1", "alm2", "class")
+
+dim(ecoli.df)
+head(ecoli.df)
+```
+
+### xtabs로 레이블별 서머리
+```{r}
+xtabs( ~ class, data = ecoli.df)
+```
+
+### Package: tree
+
+#### Making tree and plotting
+```{r}
+require(tree)
+
+# 트리 생성 (모델 적용)
+ecoli.tree1 = tree(class ~ mcg + gvh + lip + chg + aac + alm1 + alm2, data = ecoli.df)
+#ecoli.tree1 = tree(class ~ mcg, data = ecoli.df)
+ecoli.tree1
+```
+```{r}
+summary(ecoli.tree1)
+```
+
+```{r}
+plot(ecoli.tree1)
+text(ecoli.tree1, all = T)
+```
+
+```{r}
+ecoli.tree1.cv <- cv.tree(ecoli.tree1)
+plot(ecoli.tree1.cv)
+```
+
+#### Pruning tree
+```{r}
+cv.tree(ecoli.tree1)
+```
+
+```{r}
+cv <- cv.tree(ecoli.tree1)
+i <- which.min(cv$dev)
+cat("best size is",cv$size[i],"leaves\n")
+```
+
+```{r}
+plot(prune.tree(ecoli.tree1))
+```
+
+```{r}
+ecoli.tree2 = prune.misclass(ecoli.tree1, best = 6)
+summary(ecoli.tree2)
+```
+
+```{r}
+plot(ecoli.tree2)
+```

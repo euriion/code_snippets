@@ -1,0 +1,17 @@
+Metadata-Version: 1.0
+Name: dhtfs
+Version: 0.3.0
+Summary: Tagging filesystem providing dynamic directory hierarchy using tags
+Home-page: UNKNOWN
+Author: Mayuresh Phadke
+Author-email: mayuresh_phadke@qualexsystems.com
+License: UNKNOWN
+Description: 
+        This package provides a Tagging File System.
+        
+        The file system presents dynamic directory hierarchies using tags associated with
+        files in the file system.
+        
+        The file system is a layered FS developed using FUSE and the python-fuse plugin
+        
+Platform: UNKNOWN
