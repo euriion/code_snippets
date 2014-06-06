@@ -1,6 +1,4 @@
-
 # 배달업종 이용분석 #1
-
 
 데이터 출처: [bigdatahub.co.kr](http://bigdatahub.co.kr)
 
@@ -124,7 +122,9 @@ df$date <- as.Date(df$date)
 ```{r}
 # gsub("(.*)시간대", "\\1", "00시간대")
 df$time <- gsub("(.*)시간대", "\\1", df$time)
-# colnames(df) <- c("dt", "weekday", "hour", "foodtype", "freq")
+#colnames(df) <- c("dt", "weekday", "hour", "foodtype", "freq")
+
+#write.table(fastfood_stat, "/Users/euriion/Documents/workspace/code_snippets/R/fastfood_delivery/merge_data/fastfood_stat.csv", sep="\t", row.names=F, col.names=T)
 ```
 
 트렌드 플로팅을 위한 aggregation
