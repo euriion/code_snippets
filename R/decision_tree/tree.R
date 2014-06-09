@@ -23,7 +23,6 @@ data(cpus, package="MASS")
 # raw scale
 cpus.ltr <- tree(perf ~ syct+mmin+mmax+cach+chmin+chmax, cpus)
 cpus.ltr
-?tree
 summary(cpus.ltr)
 plot(cpus.ltr)
 text(cpus.ltr)

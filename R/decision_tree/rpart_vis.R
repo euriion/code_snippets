@@ -1,5 +1,6 @@
-
+# =========================================================
 # http://www.r-bloggers.com/draw-nicer-classification-and-regression-trees-with-the-rpart-plot-package/
+# =========================================================
 
 library(rpart)  			        # Popular decision tree algorithm
 library(rattle)					# Fancy tree plot
@@ -10,8 +11,11 @@ library(partykit)				# Convert rpart object to BinaryTree
 library(caret)					# Just a data source for this script
 						# but probably one of the best R packages ever. 
 data(segmentationData)				# Get some data
+dim(segmentationData)
+head(segmentationData)
+table(segmentationData$Class)
 data <- segmentationData[,-c(1,2)]
- 
+
 # Make big tree
 form <- as.formula(Class ~ .)
 tree.1 <- rpart(form, data=data, control=rpart.control(minsplit=20, cp=0))
