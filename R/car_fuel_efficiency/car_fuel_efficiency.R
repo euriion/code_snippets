@@ -1,35 +1,112 @@
-
-setwd("C:\\Users\\aiden.hong\\Documents\\workspace\\nexr-analytics\\codes\\car_fuel_efficiency")
-
-car_efficiency = read.table(file="car_fuel_efficiency.tsv", header=F, sep="\t", fileEncoding="utf-8")
-# ¹øÈ£  	¸ğµ¨¸í		¾÷Ã¼		À¯Á¾		¹è±â·®		°øÂ÷Áß·®		º¯¼ÓÇü½Ä		¿¬ºñ(§°/§¤)		±¸µî±Ş		½Åµî±Ş		CO2(g/§°)		¿¹»ó¿¬·áºñ(¿ø)
-# ¹øÈ£, ¸ğµ¨¸í, ¾÷Ã¼, À¯Á¾, ¹è±â·®, °øÂ÷Áß·®, º¯¼ÓÇü½Ä, ¿¬ºñ(§°/§¤), ±¸µî±Ş, ½Åµî±Ş, CO2(g/§°), ¿¹»ó¿¬·áºñ(¿ø)
+# -------------------------------------------------------------------
+# í•„ë“œëª…
+# ë²ˆí˜¸, ëª¨ë¸ëª…, ì—…ì²´, ìœ ì¢…, ë°°ê¸°ëŸ‰, ê³µì°¨ì¤‘ëŸ‰, ë³€ì†í˜•ì‹, ì—°ë¹„(ã/â„“), êµ¬ë“±ê¸‰, ì‹ ë“±ê¸‰, CO2(g/ã), ì˜ˆìƒì—°ë£Œë¹„(ì›)
 # no, model, maker, fuletype, displacement, weight, transmissiontype, mileage, oldgrade, newgrade, co2, oilmoneyperyear
-# ¿¹»ó¿¬·áºñ´Â 1³â°£ 16,000§°ÀÇ ÁÖÇàÁ¶°ÇÀ» ±âÁØÀ¸·Î »êÃâµÈ ±İ¾×ÀÔ´Ï´Ù.
-# (ÈÖ¹ßÀ¯ 1,929.53¿ø/§¤, °æÀ¯ 1,754.82¿ø/§¤, LPG 1,099.26¿ø/§¤)
+# ì˜ˆìƒì—°ë£Œë¹„ëŠ” 1ë…„ê°„ 16,000ãì˜ ì£¼í–‰ì¡°ê±´ì„ ê¸°ì¤€ìœ¼ë¡œ ì‚°ì¶œëœ ê¸ˆì•¡ì…ë‹ˆë‹¤.
+# (íœ˜ë°œìœ  1,929.53ì›/â„“, ê²½ìœ  1,754.82ì›/â„“, LPG 1,099.26ì›/â„“)
+# -------------------------------------------------------------------
+Sys.setlocale("LC_ALL", "ko_KR.UTF-8")
+library(RCurl)
+
+webpage <- getURL("https://raw.githubusercontent.com/euriion/code_snippets/master/R/car_fuel_efficiency/car_fuel_efficiency.tsv", .encoding="UTF-8")
+car_efficiency = read.table(file=textConnection(webpage), header=F, sep="\t", encoding="UTF-8", stringsAsFactors=FALSE)
+colnames(car_efficiency) <- c("no", "model", "maker", "fueltype", "displacement", "weight", "transmissiontype", "mileage", "oldgrade", "newgrade", "co2", "oilmoneyperyear")
 
 colnames(car_efficiency) <- c("no", "model", "maker", "fueltype", "displacement", "weight", "transmissiontype", "mileage", "oldgrade", "newgrade", "co2", "oilmoneyperyear")
 car_efficiency$oilmoneyperyear <- as.numeric(gsub(",", "", car_efficiency$oilmoneyperyear))
 
-summary(car_efficiency)
+# dim(car_efficiency)
+# head(car_efficiency)
+# plot(table(car_efficiency$mileage))
 
-# distribution 1
-# boxplot(car_efficiency$mileage)
-# distribution 2
-# boxplot(car_efficiency$oilmoneyperyear)
-# distribution 3
-# boxplot(car_efficiency$weight)
+# ìœˆë„ í°íŠ¸ ì…‹í‹°
+# WindowsFonts(fontfamily1=WindowsFont("ë§‘ì€ ê³ ë”•"))
+# par(family="fontfamily1")
+par(family="ë‚˜ëˆ”ê³ ë”•") # mac and linux
+par(mar=c(12,1,1,1) + 0.1)
+boxplot(mileage ~ maker, data=car_efficiency, las=2)
+# dev.off()
 
-par(xaxt="n")
-par(mar=c(9,4,4,2) + 0.1)
-boxplot(mileage ~ maker, data = car_efficiency)
-axis(1, at=seq(1, length(car_efficiency$maker)), labels = FALSE)
-text(x = car_efficiency$maker, par("usr")[1], labels = car_efficiency$maker, srt = 270, pos = 1, xpd = TRUE)
-dev.off()
+
+
+par(family="ë‚˜ëˆ”ê³ ë”•") # mac and linux
+par(mar=c(4,1,1,1) + 0.1)
+boxplot(mileage ~ fueltype, data=car_efficiency, las=2)
+# dev.off()
 
 # checking outliers
-car_efficiency[car_efficiency$maker %in% "(ÁÖ)AD ¸ğÅÍ½º",]
-car_efficiency[car_efficiency$maker %in% "ÇÑºÒ¸ğÅÍ½º(ÁÖ)",]$model
+car_efficiency[car_efficiency$maker %in% "(ì£¼)AD ëª¨í„°ìŠ¤",]
+car_efficiency[car_efficiency$maker %in% "í•œêµ­í† ìš”íƒ€ìë™ì°¨ãˆœ",]
+car_efficiency$maker[grep("^í•œêµ­", car_efficiency$maker)]
+
+# =======================
+# íˆìŠ¤í† ê·¸ë¨ í™•ì¸ ë° ë¹ˆë„ í™•ì¸
+dev.off()
+#colnames(car_efficiency)
+par(family="ë‚˜ëˆ”ê³ ë”•")
+hist(car_efficiency$mileage)
+hist(car_efficiency$co2)
+hist(car_efficiency$weight)
+barplot(table(car_efficiency$fueltype))
+barplot(table(car_efficiency$newgrade))
+barplot(table(car_efficiency$transmissiontype))
+
+# ============================================================
+# install.packages('reshape')
+library(reshape2)
+mat <- dcast(car_efficiency, maker ~ fueltype, mean, value.var='mileage', fill=0)
+row.names(mat)  <- mat$maker
+mat <- subset(mat, select=-maker)
+mat <- as.matrix(mat)
+dev.off()
+par(mar=c(5,1,1,11))
+par(family="ë‚˜ëˆ”ê³ ë”•") # mac and linux
+heatmap(mat)
+
+library(ggplot2)
+library(scales)
+car_df <- dcast(car_efficiency, maker ~ transmissiontype, mean, value.var='mileage', fill=0)
+dev.off()
+car_df.melt <- melt(car_df,id=c("maker"))
+ggplot(car_df.melt, aes(x=variable, y=maker), fill=value) + 
+  geom_tile(aes(fill=value)) + 
+  scale_fill_gradient(low="white", high="steelblue") +
+  theme(text=element_text(family="ë‚˜ëˆ”ê³ ë”•"))
+# ====================================
+# co2, ë¬´ê²Œ, ì—°ë¹„ì˜ ìƒí˜¸ ê´€ê³„ë¥¼ ì‚´í´ë³¸ë‹¤
+dev.off()
+colnames(car_efficiency)
+car_df <- car_efficiency[,c("co2", "weight", "mileage")]
+plot(car_df)
+
+install.packages("scatterplot3d")
+library(scatterplot3d)
 
 
-summary(car_efficiency)
+attach(car_efficiency)
+scatterplot3d(co2, weight, mileage,  
+  main="car efficiency", highlight.3d=TRUE)
+detach(car_efficiency)
+
+# í•œêº¼ë²ˆì— ë‹¤ ë³´ì
+panel.hist <- function(x, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(usr[1:2], 0, 1.5) )
+  h <- hist(x, plot = FALSE)
+  breaks <- h$breaks; nB <- length(breaks)
+  y <- h$counts; y <- y/max(y)
+  rect(breaks[-nB], 0, breaks[-1], y, col="darkorchid4", ...)
+}
+
+panel.cor <- function(x, y, digits=2, prefix="", cex.cor)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits=digits)[1]
+  txt <- paste(prefix, txt, sep="")
+  if(missing(cex.cor)) cex <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex * r)
+}
+
