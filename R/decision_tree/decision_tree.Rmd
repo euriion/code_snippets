@@ -1,7 +1,7 @@
-ì˜ì‚¬ê²°ì •ë‚˜ë¬´ (Decision Tree) ì‹œê°í™”
+?˜?‚¬ê²°ì •?‚˜ë¬? (Decision Tree) ?‹œê°í™”
 ========================================================
 
-ì›ë³¸ê¸€: http://www.r-bloggers.com/draw-nicer-classification-and-regression-trees-with-the-rpart-plot-package/
+?›ë³¸ê?€: http://www.r-bloggers.com/draw-nicer-classification-and-regression-trees-with-the-rpart-plot-package/
 
 ```{r}
 library(rpart)  			        # Popular decision tree algorithm
@@ -13,6 +13,7 @@ library(partykit)				# Convert rpart object to BinaryTree
 library(caret)					# Just a data source for this script
 						# but probably one of the best R packages ever. 
 data(segmentationData)				# Get some data
+colnames(segmentationData)
 data <- segmentationData[,-c(1,2)]
  
 # Make big tree
