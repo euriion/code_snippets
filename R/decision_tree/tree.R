@@ -23,17 +23,23 @@ data(cpus, package="MASS")
 # raw scale
 cpus.ltr <- tree(perf ~ syct+mmin+mmax+cach+chmin+chmax, cpus)
 cpus.ltr
-
+?tree
 summary(cpus.ltr)
 plot(cpus.ltr)
 text(cpus.ltr)
 
+
 ir.tr <- tree(Species ~., iris)
 ir.tr
 summary(ir.tr)
+plot(ir.tr)
+text(ir.tr)
+ir.tr.cv <- cv.tree(ir.tr,, prune.tree)
+for(i in 2:5) ir.tr.cv$dev <- ir.tr.cv$dev + cv.tree(ir.tr,, prune.tree)$dev
+ir.tr.cv$dev <- ir.tr.cv$dev/5
+plot(ir.tr.cv)
 
 
-# confusion matrix
 ###################
 ## 2 class example
 
@@ -51,6 +57,4 @@ xtab <- table(pred, truth)
 confusionMatrix(xtab)
 confusionMatrix(pred, truth)
 confusionMatrix(xtab, prevalence = 0.25) 
-
-
 
