@@ -19,3 +19,6 @@ install.packages("C50")
 install.packages("cvTools")
 install.packages("ROCR")
 
+install.packages("lattice")
+install.packages("shiny")
+install.packages("Rook")
