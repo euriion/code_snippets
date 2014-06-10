@@ -5,6 +5,7 @@ Tree model in R
 
 먼저 tree 라이브러리를 로딩합니다.
 ```{r}
+install.packages("tree")
 library(tree)
 ```
 
