@@ -1,15 +1,21 @@
 # =========================================================
-# Excel data is available in below site
-# http://faculty.knou.ac.kr/~sskim
+# Logistic Regression in R - technote
+#   * author: Seonghak Hong (euriion@gmail.com)
 # =========================================================
+
+# ---------------------------------------------------------
+# Excel data is available in below site
+# 김성수 교수님 사이트
+# http://faculty.knou.ac.kr/~sskim
+# ---------------------------------------------------------
 install.packages("xlsx")
 library(xlsx)
 drug.data <- read.xlsx("./drug.xlsx", 1)
 # attach(drug.data)
 plot(drug.data$age, drug.data$purchase, pch=19)
-# age가 높을 수독 y=1에 많으나 명확한 관계를 보기는 어렵다.
+# 플롯상으로 age가 높을 수독 y=1에 많으나 명확한 관계를 보기는 어렵다.
 
-# 나이를 그룹화해보자
+# 나이를 그룹화해서 해결을 시도
 agr <- drug.data$age
 agr[agr >= 20 & agr <= 29] <- 1
 agr[agr >= 30 & agr <= 34] <- 2
@@ -26,12 +32,14 @@ percent.table <- prop.table(purchase.table, 1)
 perc.1 <- percent.table[,2]
 agr.1 <- rownames(percent.table)
 agr.1 <- as.numeric(agr.1)
-# agr과purchase의 scatter plot. S-shape형태의 플롯
 plot(agr.1, perc.1, pch=19)
+# agr과purchase의 scatter plot. S-shape형태의 플롯이 도출
+
 # 로지스틱함수는 종속변수 Y가 0 또는 1의 두 개의 값을 갖고, 독립변수 X가 하나인 경우,
 # 주어진 X에서 Y가 1일 확률을 P(Y=1|x)라고 하고, 
 # X가 증가함에 따라 Y가 1에 수렴하고 X가 감소함에 따라 0에 수렴하는 S형태의 함수를
-# 로지스틱 함수라 한다
+# 로지스틱 함수라 함을 기억한다
+# 식은 다음과 같음
 # Latex: P(Y=1|X) = \frac{\exp{(\beta_0+\beta_1X)}}{1+\exp{(\beta_0+\beta_1X)}}
 # 자연로그로 우변의 exp를 제거하면 선형화가 가능하다
 # \ln\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1X
@@ -41,35 +49,40 @@ plot(agr.1, perc.1, pch=19)
 # 식은 다음과 같다
 # \ln\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_pX_p
 
+# ---------------------------------------------------------
 # 잔디깥기 기계의 소유자여부 데이터를 통한 로지스틱 회귀 분석
+# ---------------------------------------------------------
 library(xlsx)
 mower.data <- read.xlsx("./mower.xlsx", 1)
 head(mower.data)
 mower.logit <- glm(owner ~ . , family=binomial, data=mower.data)
 mower.logit.summary <- summary(mower.logit)
-# attributes(mower.logit.summary)
+# attributes(mower.logit.summary)  # summary에 속성들이 있으므로 참조할 것
 mower.logit.summary
-# PR이 유의수준 알파 0.05이하이면 적합되었다고 볼 수 있다
+# PR(p-value)이 유의수준 알파 0.05이하이면 적합되었다고 볼 수 있다
 # Null deviance는 상수항만 가지고 피팅한 것에 대한 통계량이며
-# Residual deviance는 독립변수를 이용해 피팅한 것에 대한 통계량이다.
-# 귀무가설 H_0는 모델이 적합함이며 대립가설 H_1는 모델이 부적합한 것이다.
-dim(mower.data)
-nrow(mower.data) - 1
+# Residual deviance는 독립변수를 이용해 피팅한 것에 대한 통계량
+# 귀무가설 H_0는 모델이 적합함이며 대립가설 H_1는 모델이 부적합
+
 # 1-pchisq(mower.logit.summary$deviance, mower.logit.summary$df.residual)
 # 1-pchisq(mower.logit.summary$null.deviance -mower.logit.summary$deviance, mower.logit.summary$df.residual)
-if (1-pchisq(mower.logit.summary$null.deviance -mower.logit.summary$deviance, mower.logit.summary$df.residual) > 0.05) {
+# 주어진 자유도를 사용할 것
+# 경우에 따라 mower.logit.summary$null.deviance - 
+if (1-pchisq(mower.logit.summary$deviance, mower.logit.summary$df.residual) > 0.05) {
   print("model is fit")
 }
 
-# get odds ratio
+# ODDS비를 구한다
 exp(cbind(coef(fit.logit), confint(fit.logit)))  
 
+# prediction 수행
 mower.predict <- predict(mower.logit, newdata=mower.data, type="response")
 pred <- ifelse(mower.predict < 0.5, "no", "yes")
 pred <- factor(pred)
+# confusion matrix 도출
 confusion.matrix <- table(mower.data$owner, pred)
+# 에러율 구하기
 error <- 1 - (sum(diag(confusion.matrix)/sum(confusion.matrix)))
-
 
 #install.packages("pROC")
 library("pROC")
@@ -78,33 +91,40 @@ mower.data.result$pred <- mower.predict
 g <- roc(owner ~ pred, data = mower.data.result)
 plot(g)  
 
-
+# ---------------------------------------------------------
 install.packages("ROCR")
 library(ROCR) 
 preds <- prediction(as.numeric(mower.data.result$pred), as.numeric(mower.data$owner)) 
-perf.tpr <- performance(preds, "tpr", "fpr") 
-plot(perf.tpr, colorize=T)
+
 perf.auc <- performance(preds, "auc")
 aucvalue <- unlist(slot(perf.auc, "y.values"))
+
+perf.tpr <- performance(preds, "tpr", "fpr") 
+plot(perf.tpr, colorize=T)
+
 perf.pr <- performance(preds, "prec", "rec") 
 plot(perf.pr, colorize=T)
+
 perf.acc <- performance(preds, "acc")
 plot(perf.acc, avg= "vertical", spread.estimate="boxplot", show.spread.at= seq(0.1, 0.9, by=0.1))
+
 perf.pcmiss <- performance(preds, "pcmiss","lift")
 plot(perf.pcmiss, colorize=T, print.cutoffs.at=seq(0,1,by=0.1), text.adj=c(1.2,1.2), avg="threshold", lwd=3)
 
 plot(perf.tpr, main="ROC Curve", lwd=2, col="darkgreen")
 text(0.5, 0.5, paste0("AUC = ",aucvalue), cex=2.2, col="darkred")
+
 plot(perf.pr, main="ROC Curve", lwd=2, col="darkgreen")
 text(0.5, 0.5, paste0("AUC = ",aucvalue), cex=2.2, col="darkred")
 
-# Total cutoff plotting
+# Total cutoff plotting을 위한 시뮬레이션 데이터
 # http://www.r-bloggers.com/sab-r-metrics-logistic-regression/
 # x = matrix(rnorm(30000),10000,3)
 # lp = 0 + x[,1] - 1.42*x[2] + .67*x[,3] + 1.1*x[,1]*x[,2] - 1.5*x[,1]*x[,3] +2.2*x[,2]*x[,3] + x[,1]*x[,2]*x[,3]
 # p = 1/(1+exp(-lp))
 # y = runif(10000)<p
 # mod = glm(y~x[,1]*x[,2]*x[,3],family="binomial")
+
 perf <- function(cutoff, model, y, class_labels)
 {
   yhat = (model$fit > cutoff)
@@ -135,8 +155,8 @@ legend(0, .25, col=c(2,"darkgreen", 4, "darkred"), lwd=c(2,2,2,2), c("Sensitivit
 
 
 # ---------------------------------------------------------
-# technote
-# 잔차 자유도는 차수만큼 빠진다.
+# 추가테크노트
+# 잔차 자유도는 로지스틱에서는 차원의 수 만큼(변수의 개수) 빠진다
 
 # * 로지스틱 회귀분석의 R^2 해석은 선형분석에서의 해석과 다름
 #   * 종속변수가 범주형이므로, 오차의 등분산성 가정이 만족 되지 않음
@@ -156,7 +176,8 @@ legend(0, .25, col=c(2,"darkgreen", 4, "darkred"), lwd=c(2,2,2,2), c("Sensitivit
 #     해당 변수를 포함하지 않은 모형과 포함한 모형의 	-2LL 차이를 구하고
 #     그 차이값이 자유도 1에서 유의미한지 우도비 검증(LR test)도 실시해야함
 # likelihood.test를 수행해야 하는데 독립변수를 점증적으로 추가하면서 필요없는 변수를 제거하는 것도 겸한다
-# * F test할 때 변수 하나 넣었을 때, 변수 하나가 통계적으로 유의하면 변수 test안해도 된다. 하나만 넣었을 때 하나의 변수가 통계적으로 유의미한 변수라고 하면, F test하면 변수 하나 추가된 모델이 더 좋은 모델이다.
+# * F test할 때 변수 하나 넣었을 때, 변수 하나가 통계적으로 유의하면 변수 test안해도 된다. 하나만 넣었을 때 하나의 변수가 통계적으로 유의미한 변수라고 하면, 
+# F test하면 변수 하나 추가된 모델이 더 좋은 모델이다.
 # 
 # * Wald 검증과 우도비 검증 비교
 # 	* 공통점 : 자유도 1에서 chi-square 검증을 한다.
@@ -165,11 +186,11 @@ legend(0, .25, col=c(2,"darkgreen", 4, "darkred"), lwd=c(2,2,2,2), c("Sensitivit
 # 	* 어느 검증을 사용할 것인가? : 더 많은 학자들이 우도비 검증을 지지한다.  
 # 	* 이런 경우는 표본의 크기가 크지 않은 상황이다. 그 상황에서는 우도비 검증을 따른다.
 # 
-# * 로지스틱 회귀계수의 표준화?
-# 	*  output보면 표준화회귀계수값 보고 안한다..
+# * 로지스틱 회귀계수의 표준화
+# 	*  output보면 표준화회귀계수값 보고 하지 않음
 # 	*  통계 프로그램에서 로지스틱 회귀계수에 대한 표준화 값을 제공해 주지 않을 뿐만 아니라
-# 	*  표준화된 값에 대한 해석 역시 선형 회귀분석에서처럼 간단하지 않다.
-# 	*  로짓에 대한 표준편차를 구해야 하므로…(복잡하다. 두번 세번 transform한 것에 대해서 구해야 하므로)
-# 	*  위계선형모형도 SAS를 쓰면 간편하게 돌릴 수 있다.
+# 	*  표준화된 값에 대한 해석 역시 선형 회귀분석에서처럼 간단하지 않음
+# 	*  로짓에 대한 표준편차를 구해야 함 (복잡. 두번 세번 transform한 것에 대해서 구해야 ㅎ함)
+# 	*  위계선형모형도 SAS를 쓰면 간편하게 돌릴 수 있음
 # 	*  Cf. 선형 회귀분석에서는 비표준화 계수(b)에 SDx/SDy를 곱해서 표준화 계수 도출
 # 	*  Beta = b(SD_x/SD_y)
