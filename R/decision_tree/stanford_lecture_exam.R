@@ -1,17 +1,19 @@
-# starnford CART lecture
-# http://statweb.stanford.edu/~lpekelis/talks/13_datafest_cart_talk.pdf
-# http://statweb.stanford.edu/~lpekelis/13_datafest_cart/
+# =========================================================
+# Starnford Data Mining - CART lecture
+# 	Reference:
+# 		http://statweb.stanford.edu/~lpekelis/talks/13_datafest_cart_talk.pdf
+# 		http://statweb.stanford.edu/~lpekelis/13_datafest_cart/
+# =========================================================
 
 # install the package to R
-install.packages("rpart", repos = "http://cran.nexr.com")
+install.packages("rpart", repos="http://cran.nexr.com")
 
 # load the library
 library(rpart)
-# load the dataset
+# load the dataset (example)
 load("spac.Rdata")
 head(spac.data)
 spac.tree = rpart(Donation ~ ., data = spac.data, cp = 10^(-6))
-
 
 #### the function arguments:
 # 1) formula, of the form: outcome ~ predictors
@@ -47,7 +49,6 @@ library(partykit)
 plot(spac.tree9)
 text(spac.tree9)
 boxplot(spac.tree9)
-
 
 # will use a combination of list entries: frame, splits, and csplit
 spac.tree9$frame[1:5, ]
@@ -115,29 +116,29 @@ round(spac.tree$cptable[which.min(cpstat), ], 3)
 # suggests a tree size with 39 splits
 
 
-Advantages of Trees
-1. Fast computations
-2. Invariant under monotone transformations of variables
-Scaling doesn’t matter!
-  Immune to outliers in x
-3. Resistence to irrelevant variables, so can throw lots of variables into it
-4. One tuning parameter (tree size, or cp)
-5. Interpretable model representation
-6. Handles missing data by keeping track of surrogate, or highly correlated,
-backup splits at every node
-7. Extends to categorical outcomes easily
+# Advantages of Trees
+# 1. Fast computations
+# 2. Invariant under monotone transformations of variables
+# Scaling doesn’t matter!
+#   Immune to outliers in x
+# 3. Resistence to irrelevant variables, so can throw lots of variables into it
+# 4. One tuning parameter (tree size, or cp)
+# 5. Interpretable model representation
+# 6. Handles missing data by keeping track of surrogate, or highly correlated,
+# backup splits at every node
+# 7. Extends to categorical outcomes easily
 
-Disadvantages of Trees
-1. Accuracy
-may not be piecewise constant (but decent overall approximation)
-Data Fragmentation (ok, if you have lots of data)
-must involve high order interactions
-2. Variance
-Each subsequent split depends on the previous ones, so an error in a higher split is propogated
-down.
-Small change in dataset can cause big change in tree
-If you only have a random sample of a population, this can be a problem.
-Not as much of an issue if you’re describing a dataset
+# Disadvantages of Trees
+# 1. Accuracy
+# may not be piecewise constant (but decent overall approximation)
+# Data Fragmentation (ok, if you have lots of data)
+# must involve high order interactions
+# 2. Variance
+# Each subsequent split depends on the previous ones, so an error in a higher split is propogated
+# down.
+# Small change in dataset can cause big change in tree
+# If you only have a random sample of a population, this can be a problem.
+# Not as much of an issue if you’re describing a dataset
 
 
 # Elements of Statistical Learning. 2009. New York. Springer. xxii, 745 p. : ill. ; 24 cm.
@@ -145,19 +146,19 @@ Not as much of an issue if you’re describing a dataset
 # http://www-stat.stanford.edu/~owen/courses/321/readings/CV-SVD-JSM.pdf
 
 
-Two solutions to Disadvantages (extra slides)
-1. Boosted Trees, aka Forests, MART
-Now each is a tree, and is a linear combination of trees
-Each tree can model an additive effect, or many low order interactions
-Variance of a combination of identically distributed objects is lower than any individual
-Disadvantage: loses decision tree interpretability unless K is small
-2. Random Forests
-Similar to boosted trees, but now random subsets of the data are used for each tree
-Simpler to fit than boosted trees
-Accuracy is usually somewhere in between a single tree and boosted trees
+# Two solutions to Disadvantages (extra slides)
+# 1. Boosted Trees, aka Forests, MART
+# Now each is a tree, and is a linear combination of trees
+# Each tree can model an additive effect, or many low order interactions
+# Variance of a combination of identically distributed objects is lower than any individual
+# Disadvantage: loses decision tree interpretability unless K is small
+# 2. Random Forests
+# Similar to boosted trees, but now random subsets of the data are used for each tree
+# Simpler to fit than boosted trees
+# Accuracy is usually somewhere in between a single tree and boosted trees
 
-How are Boosted Trees Interpreted? (extra slides)
-Relative Importance
-Average overall improvement of objective by variable 
-Partial Dependence
-Predicted outcome using , after averaging out the others
+# How are Boosted Trees Interpreted? (extra slides)
+# Relative Importance
+# Average overall improvement of objective by variable 
+# Partial Dependence
+# Predicted outcome using , after averaging out the others

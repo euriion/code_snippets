@@ -16,8 +16,8 @@ library(xlsx)
 drug.data <- read.xlsx("./drug.xlsx", 1)
 # attach(drug.data)
 plot(drug.data$age, drug.data$purchase, pch=19)
-# 플롯상으로 age가 높을 수독 y=1에 많으나 명확한 관계를 보기는 어렵다.
-
+# 플롯상으로 age가 높을 수록 y=1에 속하는 것이 많으나 
+# 이것만으로는 명확한 관계를 보기 어려움
 # 나이를 그룹화해서 해결을 시도
 agr <- drug.data$age
 agr[agr >= 20 & agr <= 29] <- 1
