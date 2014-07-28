@@ -1,15 +1,18 @@
 __author__ = 'aiden.hong'
 # -*- coding: utf-8 -*-
 
-# 이하의 파이선 언어로 작상한 경사 하강법 알고리즘은 f(x)=x^4−3x^3+2 함수의 극값을 미분값인 f'(x)=4x^3−9x^2 를 통해 찾는 예를 보여준다.
+"""
+이하의 파이선 언어로 작상한 경사 하강법 알고리즘은 f(x)=x^4−3x^3+2 함수의 극값을 미분값인 f'(x)=4x^3−9x^2 를 통해 찾는 예를 보여준다.
+From calculation, we expect that the local minimum occurs at x=9/4
+"""
 
-# From calculation, we expect that the local minimum occurs at x=9/4
 print "Expected local minimum: ", 9.0/4.0
 
 x_old = 0
-x_new = 6 # The algorithm starts at x=6
-eps = 0.01 # step size
+x_new = 6  # The algorithm starts at x=6
+eps = 0.01  # step size
 precision = 0.00001
+
 
 def f_prime(x):
     return 4 * x**3 - 9 * x**2
