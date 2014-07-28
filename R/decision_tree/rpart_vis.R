@@ -59,6 +59,7 @@ prp(new.tree.1) # display the new tree
 tree.2 <- rpart(form, data)			# A more reasonable tree
 prp(tree.2)                                     # A fast plot													
 fancyRpartPlot(tree.2)				# A fancy plot from rattle
+
 #
 #-------------------------------------------------------------------
 
