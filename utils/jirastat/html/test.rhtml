@@ -1,0 +1,18 @@
+<%
+path.www.base <- "/var/www/html"
+source(sprintf("%s/common.R", path.www.base))
+%>
+<html>
+<head><title></title></head>
+<body>
+<%=format(Sys.time(),'%B %d, %Y')%><br />
+values: <%=a%><br />
+<pre><code>
+<%
+print(SERVER)
+print(GET)
+print(POST)
+%>
+</code></pre>
+</body>
+</html>

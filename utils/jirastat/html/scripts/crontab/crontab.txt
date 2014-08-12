@@ -1,0 +1,2 @@
+30 8 * * 1,2,3,4,5 /usr/bin/Rscript /var/www/html/jirastat/scripts/sendmail.R > /dev/null 2>&1
+30 15 * * 1,2,3,4,5 /usr/bin/Rscript /var/www/html/jirastat/scripts/sendmail.R > /dev/null 2>&1

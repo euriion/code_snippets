@@ -1,0 +1,18 @@
+[
+    {
+        "caption": "Insert Vim folding marker ##",
+        "command": "insert_vim_folding_marker", "args": {"remarker": "##"}
+    },
+    {
+        "caption": "Insert Vim folding marker //",
+        "command": "insert_vim_folding_marker", "args": {"remarker": "//"}
+    },
+    {
+        "caption": "Insert Vim folding marker --",
+        "command": "insert_vim_folding_marker", "args": {"remarker": "--"}
+    },
+    {
+        "caption": "Insert Vim folding marker (prompt)",
+        "command": "insert_vim_folding_marker", "args": {"remarker": "##", "prompt":true}
+    }
+]
