@@ -1,0 +1,16 @@
+---
+title: "mixtools_exam.Rmd"
+output: html_document
+---
+
+
+
+```{r}
+# install.packages("mixtools")
+library(mixtools)
+  
+wait = faithful$waiting
+mixmdl = normalmixEM(wait)
+plot(mixmdl,which=2)
+lines(density(wait), lty=2, lwd=2)
+```

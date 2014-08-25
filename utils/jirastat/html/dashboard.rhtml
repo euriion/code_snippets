@@ -1,0 +1,259 @@
+<%
+source("/var/www/html/jirastat/common/user.R")
+
+if (!is.null(GET$username)) {
+    targetUsername <- GET$username
+} else {
+    targetUsername <- "";
+}
+
+if (targetUsername != "") {
+    userlist <- unique(c(targetUsername, sort(users), sort(extrausers)))
+} else {
+    userlist <- unique(c(sort(users), sort(extrausers)))
+}
+page_title <- "JIRA status-board"
+%>
+<html>
+<head>
+    <title><%=page_title%></title>
+    <style>
+    
+body {
+    
+}
+td {
+    vertical-align: top;
+    line-height: 135%;
+    background-color: #fff;
+    padding: 0px 0px 0px 0px;
+}
+
+th {
+    font-size: 11pt;
+    background-color: #eee;
+}
+
+.maintable {
+    #background-color:#f0f0f0;
+}
+
+.funccreateissue {
+    font-size: 12px;
+    text-decoration: none;
+    background-color: #ffffff;
+    color: #0000ff;
+    border: thin solid #6159ff;
+    padding: 1px 1px 1px 1px;
+}
+.funccreateissue:hover {
+    font-size: 12px;
+    text-decoration: none;
+    background-color: #6159ff;
+    color: #ffffff;
+    border: thin solid #000000;
+    padding: 1px 1px 1px 1px;
+}
+
+.addworklog {
+    font-size:10px;
+    text-decoration: none;
+    background-color: #fff;
+    color: #089f1b;
+    border: thin solid #4a9f37;
+    padding: 1px 1px 1px 1px;
+}
+
+.addworklog:hover {
+    font-size:10px;
+    text-decoration: none;
+    background-color: #4a9f37;
+    color: #ffffff;
+    border: thin solid #000000;
+    padding: 1px 1px 1px 1px;
+}
+
+.issuelink {
+    font-size:11pt;
+    text-decoration: none;
+    background-color: #fff;
+    color: #000000;
+    border: thin solid #cccccc;
+    border-style: dotted;
+    border-radius: 3px;
+    padding: 2px 2px 2px 2px;
+}
+
+.issuelink:hover {
+    background-color: #ee0;
+}
+
+.tableseparater {
+    border-bottom: thin dotted #ccc;
+    height: 1px;
+}
+
+.username {
+    font-size: 12pt;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+}
+.issueSummary {
+    font-size:14px;
+    color: #4c4c4c;
+}
+
+.targetusercell {
+    background-color: #fafafa;
+}
+
+.nonetargetusercell {
+    
+}
+
+.status_Complete {
+    font-size:10px;
+    text-decoration: none;
+    background-color: #ddd;
+    color: #000000;
+    border: thin solid #000;
+    border-style: dotted;
+    border-radius: 3px;
+    padding: 2px 2px 2px 2px;
+}
+
+.status_Start {
+    font-size:10px;
+    text-decoration: none;
+    background-color: #5893ff;
+    color: #000000;
+    border: thin solid #000;
+    border-style: dotted;
+    border-radius: 3px;
+    padding: 2px 2px 2px 2px;
+}
+
+.status_End {
+    font-size:10px;
+    text-decoration: none;
+    background-color: #ddd;
+    color: #000000;
+    border: thin solid #000;
+    border-style: dotted;
+    border-radius: 3px;
+    padding: 2px 2px 2px 2px;
+}
+
+
+.status_Open {
+    font-size:10px;
+    text-decoration: none;
+    background-color: #dd0;
+    color: #000000;
+    border: thin solid #000;
+    border-style: dotted;
+    border-radius: 3px;
+    padding: 2px 2px 2px 2px;
+}
+
+    </style>
+</head>
+<body>
+<span style="font-size: 25pt;font-weight: bold">Jira status-board for Data-science team</span><br />
+<br />
+<table class='maintable'>
+<tr><th>PIC</th><th>Member</th><th>Issues</th><th>Util</th><th>Current issues</th><th>EST</th><th>SPNT</th><th>Today</th><th>1<br />day<br />ago</th><th>2<br />day<br />ago</th><th>3<br />day<br />ago</th><th>4<br />day<br />ago</th><th>5<br />day<br />ago</th><th>6<br />day<br />ago</th></tr>
+<%
+#today <- format(as.POSIXlt(Sys.time(), tz="GMT-9"), format="%Y-%m-%d")
+#yesterday <- format(as.POSIXlt(Sys.time() - 3600*24, tz="GMT-9"), format="%Y-%m-%d")
+datelist <- sapply(0:6, function(x) { format(as.POSIXlt(Sys.time() - (x*3600*24), tz="GMT-9"), format="%Y-%m-%d")} )
+
+
+for(userName in userlist) {
+    if (userName == targetUsername) {
+        cellclass <- 'targetusercell'
+    } else {
+        cellclass <- 'nonetargetusercell'
+    }
+    
+    if (userName == "-") {
+        cat("<tr><td colspan='5'>&nbsp;</td></tr>", "\n", sep="")
+    }
+    else {
+        resOpenedIssues <- getOpenedIssuesByUser(userName)
+        
+        datetable <- data.frame(cbind(date=datelist, value=rep(0,7)))
+        datetable$value <- 0
+
+        sumOriginalEstimate <- 0
+        sumTimeSpent <- 0
+        todayTimeSpent <- 0
+        yesterdayTimeSpent <- 0
+        
+        cat("<tr>", "\n", sep="")
+        cat("<td class='",cellclass,"'>",makeAvatarImage(userName),"</td>", "\n", sep="")
+        cat("<td class='",cellclass,"'>", "<a class='username' href='", makeLinkUserProfile(userName), "' target='_blank'>",userName,"</a>", "</td>", "\n", sep="")
+        cat("<td class='",cellclass,"'>",resOpenedIssues$total ,"</td>", "\n", sep="")
+        cat("<td class='",cellclass,"'><a class='funccreateissue' href='http://jira.nexrcorp.com/secure/CreateIssueDetails!init.jspa?pid=11004&issuetype=3&priority=3&Create=Create&assignee=",userName,"' target='_blank'>create</a></td>", "\n", sep="")
+        cat("<td class='",cellclass,"'>", "\n", sep="")
+        
+        resRecentIssues <- getRecentIssuesByUser(userName)
+        for (issue in resRecentIssues$issues) {
+            
+            issueInfo <- getIssue(issue$key)
+            
+            addWorklogLink <- sprintf("<a class='addworklog' href='http://jira.nexrcorp.com/secure/CreateWorklog!default.jspa?key=%s' target='_blank'>worklog</a>", issue$key)
+            issueSummary <- sprintf("<span class='issueSummary'>%s</span>", issueInfo$fields$summary$value)
+            
+            
+            if (!any(issueInfo$fields$status$value$name == c("Closed", "Complete"))) {
+                cat(makeLinkIssue(issue$key), "\n", sep="")
+                cat(sprintf("<span class='status_%s'>", issueInfo$fields$status$value$name), issueInfo$fields$status$value$name, "</span>", "\n", sep="")
+                cat(addWorklogLink, "\n", sep="")
+                cat(issueSummary, "<br />", "\n", sep="")
+            }
+            
+            if (!any(issueInfo$fields$status$value$name == c("Complete", "End"))) {
+                if (!is.null(issueInfo$fields$timetracking$value$timeoriginalestimate)) {
+                    sumOriginalEstimate <- sumOriginalEstimate + issueInfo$fields$timetracking$value$timeoriginalestimate
+                }
+                
+                if (!is.null(issueInfo$fields$timetracking$value$timespent)) {
+                    sumTimeSpent <- sumTimeSpent + issueInfo$fields$timetracking$value$timespent
+                }
+            }
+            
+            if (!is.null(issueInfo$fields$worklog$value)) {
+                for (worklog in issueInfo$fields$worklog$value) {
+                    
+                    worklog_createdate <- unlist(strsplit(worklog$created, "T"))[1]
+                    
+                    if(any(datetable$date == worklog_createdate)) {
+                        datetable[datetable$date == worklog_createdate, 2] <- datetable[datetable$date == worklog_createdate, 2] + worklog$minutesSpent 
+                    }
+                }
+            }
+            
+        }
+
+        cat("</td>", "\n", sep="")
+        cat("<td class='",cellclass,"'>", as.character(round(sumOriginalEstimate/60, 1)), "</td>", "\n", sep="")
+        cat("<td class='",cellclass,"'>", as.character(round(sumTimeSpent/60, 1)), "</td>", "\n", sep="")
+        sapply(datetable[,2], function(x) {
+            cat("<td class='",cellclass,"'>", as.character(round(x/60, 1)), "</td>", "\n", sep="")    
+        })
+        
+        cat("</tr>\n", "\n", sep="")
+        cat("<tr>\n", "\n", sep="")
+        cat("<td class='tableseparater' colspan='14'></td>", "\n", sep="")
+        cat("</tr>\n", "\n", sep="")
+    }
+}
+%>
+</table>
+<%
+%>
+</body>
+</html>
+

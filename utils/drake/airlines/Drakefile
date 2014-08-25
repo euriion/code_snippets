@@ -1,0 +1,141 @@
+source_webpage_url="http://stat-computing.org/dataexpo/2009/the-data.html"
+source_baseurl="http://stat-computing.org/dataexpo/2009/"
+hadoop_home="`env HADOOP_HOME`"
+hive_home="`env HIVE_HOME`"
+database_name="airlines"
+table_name="airlines"
+hdfs_basepath="/airlines"
+
+source_webpage.html <- [shell]
+  echo "Source URL is $source_webpage_url"
+  wget -O $OUTPUT "$source_webpage_url"
+
+source_filelist.txt <- source_webpage.html [python]
+  import BeautifulSoup
+  content = open("$[INPUT]").read()
+  baseUrl = "$[source_baseurl]"
+  soup = BeautifulSoup.BeautifulSoup(content)
+  elements = soup.body.find('div', attrs={'id':'doc','class':'yui-t4'}).find('div', attrs={'id':'bd'}).find('div', attrs={'id':'yui-main'}).find('div', attrs={'class':'yui-b'}).find('div', attrs={'class':'yui-g'}).findAll('p')[3].findAll('a')
+  fdOutput = open("$[OUTPUT]", 'w')
+  for element in elements:
+    fdOutput.write("%s/%s\n" % (baseUrl.strip('/'), element['href']))
+  fdOutput.close()
+
+result.log <- source_filelist.txt [python]
+  import re
+  import os
+  import subprocess
+  def hdfsFileExists(filename):
+    output, error = subprocess.Popen("/home/ndap/ndap/modules/hadoop/bin/hadoop fs -count %s" % filename, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    if output.strip():
+      return(True)
+    else:
+      return(False)
+  def hdfsMakeDirectory(directory):
+    subproc = subprocess.Popen("/home/ndap/ndap/modules/hadoop/bin/hadoop fs -mkdir /airlines", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = subproc.communicate()
+    if subproc.returncode == 0:
+      return(True)
+    else:
+      return(False)
+  def createDatabase(databaseName):
+    subproc = subprocess.Popen("/home/ndap/ndap/modules/hive/bin/hive -e 'create database %s'" % databaseName, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = subproc.communicate()
+    if subproc.returncode == 0:
+      return(True)
+    else:
+      return(False)
+  def addPartition(tableName, partitionValue, location):
+    sql = "use airlines; ALTER TABLE %s ADD PARTITION (p_year = '%s') location '%s'" % (tableName, partitionValue, location)
+    print(sql)
+    subproc = subprocess.Popen("/home/ndap/ndap/modules/hive/bin/hive -e \"%s\"" % sql, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = subproc.communicate()
+    if subproc.returncode == 0:
+      return(True)
+    else:
+      return(False)
+  def createAirlinesTable():
+    sql = """
+      CREATE TABLE IF NOT EXISTS airlines.airlines(
+        year              INT    COMMENT '1987-2008',
+        month             INT    COMMENT '1-12',
+        dayofmonth        INT    COMMENT '1-31',
+        dayofweek         INT    COMMENT '1 (Monday) - 7 (Sunday)',
+        deptime           STRING COMMENT 'actual departure time (local, hhmm)',
+        crsdeptime        STRING COMMENT 'scheduled departure time (local, hhmm)',
+        arrtime           STRING COMMENT 'actual arrival time (local, hhmm)',
+        crsarrtime        STRING COMMENT 'scheduled arrival time (local, hhmm)',
+        uniquecarrier     STRING COMMENT 'unique carrier code',
+        flightnum         STRING COMMENT 'flight number',
+        tailnum           STRING COMMENT 'plane tail number',
+        actualelapsedtime INT    COMMENT 'in minutes',
+        crselapsedtime    INT    COMMENT 'in minutes',
+        airtime           INT    COMMENT 'in minutes',
+        arrdelay          INT    COMMENT 'arrival delay, in minutes',
+        depdelay          INT    COMMENT 'departure delay, in minutes',
+        origin            STRING COMMENT 'origin IATA airport code',
+        dest              STRING COMMENT 'destination IATA airport code',
+        distance          INT    COMMENT 'in miles',
+        taxiin            INT    COMMENT 'taxi in time, in minutes',
+        taxiout           INT    COMMENT 'taxi out time in minutes',
+        cancelled         STRING COMMENT 'was the flight cancelled?',
+        cancellationcode  STRING COMMENT 'reason for cancellation (A = carrier, B = weather, C = NAS, D = security)',
+        diverted          STRING COMMENT '1 = yes, 0 = no',
+        carrierdelay      INT    COMMENT 'in minutes',
+        weatherdelay      INT    COMMENT 'in minutes',
+        nasdelay          INT    COMMENT 'in minutes',
+        securitydelay     INT    COMMENT 'in minutes',
+        lateaircraftdelay INT    COMMENT 'in minutes'
+      ) COMMENT 'Air lines data'
+      PARTITIONED BY (p_year STRING)
+      ROW FORMAT DELIMITED
+        FIELDS TERMINATED BY ','
+      STORED AS TEXTFILE
+      LOCATION '/airlines'
+      """
+    tempSqlFile = "./temp.ddl.sql"
+    open(tempSqlFile, 'w').write(sql)
+    subproc = subprocess.Popen("/home/ndap/ndap/modules/hive/bin/hive -f %s" % tempSqlFile, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # os.unlink(tempSqlFile)
+    output, error = subproc.communicate()
+    if subproc.returncode == 0:
+      return(True)
+    else:
+      return(False)
+  patternGetPatition = re.compile("http://stat-computing.org/dataexpo/2009/(.*)[.]csv[.]bz2")
+  output, error = subprocess.Popen("/home/ndap/ndap/modules/hadoop/bin/hadoop fs -count /airlines", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+  if output.strip():
+    print("database location already exist")
+    output, error = subprocess.Popen("/home/ndap/ndap/modules/hadoop/bin/hadoop fs -mkdir /airlines", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+  print "Database checking"
+  output, error = subprocess.Popen("/home/ndap/ndap/modules/hive/bin/hive -e 'desc database airlines'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+  if output.strip() == "No such database: airlines":
+    print "Create database airlines"
+    createDatabase('airlines')
+  # --------------------------------------------------
+  # create table
+  # --------------------------------------------------
+  print "Checking table airlines.airlines"
+  output, error = subprocess.Popen("/home/ndap/ndap/modules/hive/bin/hive -e 'desc airlines.airlines'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+  if output.strip() == "Table airlines does not exist":
+    print "Create airlines.airlines table"
+    createAirlinesTable()
+  # --------------------------------------------------
+  # append data location
+  # --------------------------------------------------
+  for rawLine in open("$[INPUT]"):
+    filename = rawLine.strip()
+    grabbed = patternGetPatition.findall(filename)
+    if len(grabbed) == 1:
+      year = grabbed[0]
+      print("Putting data on %s" % year)
+      if not hdfsFileExists("/airlines/%s"):
+        hdfsMakeDirectory("/airlines/%s")
+      os.system("/home/ndap/ndap/modules/hadoop/bin/hadoop fs -rm %s" % ("/airlines/%s/*" % year))
+      os.system("wget %s" % filename)
+      os.system("bunzip2 %s" % os.path.basename(filename))
+      os.system("/home/ndap/ndap/modules/hadoop/bin/hadoop fs -put %s %s" % ("%s.csv" % year, "/airlines/%s/" % year))
+      os.unlink("./%s.csv" % year)
+      print("Add partition %s" % "/airlines/%s" % year)
+      addPartition('airlines', year, "/airlines/%s" % year)
+
