@@ -1,0 +1,15 @@
+data(geyser, package="MASS")
+x <- cbind(geyser$duration, geyser$waiting)
+plot(x)
+install.packages("KernSmooth")
+library(KernSmooth)
+est <- bkde2D(x, bandwidth=c(0.7, 7))
+plot(est)
+contour(est$x1, est$x2, est$fhat)
+persp(est$fhat)
+
+?bkde2D
+??integrate.xy
+?integrate
+??KernSmooth
+?im
