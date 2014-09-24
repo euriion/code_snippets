@@ -1,0 +1,42 @@
+\documentclass{article}
+\usepackage[a4paper, top=3cm, bottom=3cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+\usepackage{makeidx}
+\usepackage{parskip}
+\usepackage[hangul]{kotex}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{tcolorbox}
+\usepackage{makecell}
+
+\usepackage{environ}
+\usepackage{xcolor}
+\usepackage[tikz]{bclogo}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\tcbuselibrary{many}
+
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\begin{document}
+
+\section*{Lagrange Multiplier (라그랑지 승수법)}
+
+\subsection*{연습문제}
+
+함수 $f(x,y,z) = 3x + 2y + 4z$ 의 최대값, 최소값을 구하라. \\
+단, 조건 $x^{2} + 2y^{2} + 6z^{2} = 9$을 만족해야 한다.
+
+조건이 없는 경우에는 미분으로 문제를 해결할 수 있다.
+
+\end{document}
