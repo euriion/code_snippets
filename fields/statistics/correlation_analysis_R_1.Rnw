@@ -1,0 +1,53 @@
+\documentclass{article}
+\usepackage[a4paper, top=3cm, bottom=3cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+\usepackage{makeidx}
+\usepackage{parskip}
+\usepackage[hangul]{kotex}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{tcolorbox}
+\usepackage{makecell}
+
+\usepackage{environ}
+\usepackage{xcolor}
+\usepackage[tikz]{bclogo}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\tcbuselibrary{many}
+
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\begin{document}
+
+\section*{Corrleation Analysis (연관관계 분석)}
+
+\subsection*{개요}
+두 변수의 관계를 분석하는 것으로 Bivariate Analysis라고 구분할 수 있다.
+Correlation은 두 변수의 선형상관관계 즉, 직선적으로 관련성이 있는지 확인하는 것이다. 주로 설명변수(독립변수)들 관의 상관관계 또는 설명변수와 결과변수(종속변수)의 상관관계가 있는지 확인하는 매우 기초적인 방법이다.
+
+\subsection*{방법}
+
+두변수의 상관관계를 보는 것은 상관계수(correlation coffiecient)를 구한 뒤 그것을 이용해 T점수를 산출하여 가설검정을 하는 방법과 산점도(Scatter Plot) 그래프를 그려 육안으로 확인하는 방법 2가지가 있다. \\
+correlation cofficient만을 계산하여 분석하는 경우 이상치(outlier)등으로 인한 문제가 보이지 않으므로 보통 2가지를 다 수행하는 것이 좋다.
+빅데이터의 경우 데이터 양이 매우 많으므로 플로팅이 가능하지 않은 경우가 많으 므로 더욱 유의하여야 한다.
+
+\subsubsection*{산점도(Scatter plot)}
+
+2차원 그래프로 $X$축과$Y$축에 각각 다른 변수들을 축의 기준으로 잡고 좌표상에 점을 찍어 표현하여 흩어진 정도를 보는 기초적인 플로팅 기법이다.
+
+\subsection*{연습문제}
+
+연습문제
+
+\end{document}
