@@ -5,9 +5,10 @@ Hardware configuration and specification checking
 ## How to use
 
 ### Execute below command on your terminal
-<pre><code>sudo perl &lt;&lt;&lt; "$(curl -fsSL https://raw.github.com/euriion/TomorrowWorks/master/sysinfo/tmr_sysinfo)"
-</code></pre>
+
+    sudo perl <<< "$(curl -fsSL https://raw.github.com/euriion/code_snippets/master/sysinfo/sysinfo)"
+
 or
-<pre><code>sudo bash -c "curl -fsSL https://raw.github.com/euriion/TomorrowWorks/master/sysinfo/tmr_sysinfo | perl"
-</code></pre>
+
+    sudo bash -c "curl -fsSL https://raw.github.com/euriion/code_snippets/master/sysinfo/sysinfo | perl"
 
