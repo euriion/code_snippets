@@ -13,11 +13,11 @@ class TableSchemeExtractor(object):
 
     def initialize(self):
         self.__connection_param = {
-          'host' : "127.0.01",
-          'port' : "3306",
-          'user' : "id",
-          'password' : "pw",
-          'database' : "db"
+          'host': "127.0.01",
+          'port': "3306",
+          'user': "id",
+          'password': "pw",
+          'database': "db"
         }
 
         self.__sa_engine = create_engine("mysql://%(user)s:%(password)s@%(host)s:%(port)s/%(database)s?charset=utf8" % self.__connection_param, pool_recycle=3600)
